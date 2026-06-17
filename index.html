@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio de Tareas v2</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .cv-container {
+            max-width: 700px;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .datos-escolares {
+            background: #eef2f3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .datos-escolares p {
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+        .datos-escolares strong {
+            color: #34495e;
+        }
+        .lista-tareas {
+            list-style: none;
+            padding: 0;
+        }
+        .tarea-item {
+            background: #fff;
+            margin-bottom: 12px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tarea-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .tarea-link {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .tarea-link:hover {
+            background-color: #2980b9;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cv-container">
+    <header>
+        <h1>Currículum Vitae - Portafolio</h1>
+        <div class="datos-escolares">
+            <p><strong>Nombre:</strong> Javier Alejandro Oropeza Millan</p>
+            <p><strong>Matrícula:</strong> 24040139</p>
+            <p><strong>Grupo:</strong> isof 02</p>
+        </div>
+    </header>
+
+    <section>
+        <h2>Tareas del Semestre</h2>
+        <ul id="contenedor-tareas" class="lista-tareas">
+            <li>Cargando tareas desde la API...</li>
+        </ul>
+    </section>
+</div>
+
+<script>
+    // URL de tu API (Cambiar por la URL de Render cuando lo despliegues)
+    const API_URL = 'http://localhost:5000/api/tareas';
+
+    async function obtenerTareas() {
+        const contenedor = document.getElementById('contenedor-tareas');
+        try {
+            const respuesta = await fetch(API_URL);
+            if (!respuesta.ok) throw new Error('Error al conectar con la API');
+            
+            const tareas = await respuesta.json();
+            contenedor.innerHTML = ''; // Limpiar mensaje de carga
+
+            if(tareas.length === 0) {
+                contenedor.innerHTML = '<li>No se encontraron tareas en la base de datos.</li>';
+                return;
+            }
+
+            tareas.forEach(tarea => {
+                const li = document.createElement('li');
+                li.className = 'tarea-item';
+                
+                // Muestra el ID de la BD y el Título
+                li.innerHTML = `
+                    <span><strong>[ID: ${tarea._id || tarea.id}]</strong> ${tarea.titulo}</span>
+                    <a href="${tarea.url}" target="_blank" class="tarea-link">Abrir Tarea</a>
+                `;
+                contenedor.appendChild(li);
+            });
+
+        } catch (error) {
+            console.error(error);
+            contenedor.innerHTML = `<li class="error">Error: No se pudo cargar el listado de tareas. Asegúrate de que el backend esté corriendo.</li>`;
+        }
+    }
+
+    // Ejecutar la petición al cargar la página
+    document.addEventListener('DOMContentLoaded', obtenerTareas);
+</script>
+
+</body>
+</html>
